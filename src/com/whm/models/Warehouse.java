@@ -7,46 +7,54 @@ import java.util.Map;
 
 public class Warehouse {
     private String name;
-    private Map<String, Integer> storage;
+    private Map<String, Integer> inventory;
     private List<ItemTransactionRecordEntry> transactionRecord;
 
     public Warehouse(String name) {
         this.name = name;
-        this.storage = new HashMap<>();
+        this.inventory = new HashMap<>();
         this.transactionRecord = new ArrayList<>();
     }
 
     public void addItems(CustomTimestamp timestamp, String itemName, int itemQuantity) {
-        if(this.storage.containsKey(itemName)) {
+        if(this.inventory.containsKey(itemName)) {
             // Item in found in storage, update quantity
-            Integer newQuantity = this.storage.get(itemName) + itemQuantity;
-            this.storage.put(itemName, newQuantity);
+            Integer newQuantity = this.inventory.get(itemName) + itemQuantity;
+            this.inventory.put(itemName, newQuantity);
         } else {
             // Item is not in storage, create entry
-            this.storage.put(itemName, itemQuantity);
+            this.inventory.put(itemName, itemQuantity);
         }
 
-        this.transactionRecord.add(new ItemTransactionRecordEntry(timestamp, itemQuantity, itemName, "IN"));
+        // If items are added to the inventory, the transaction type "IN" denotes it
+        this.transactionRecord.add(new ItemTransactionRecordEntry(timestamp, itemName, this.name, itemQuantity, "IN"));
     }
 
     public void removeItems(CustomTimestamp timestamp, String itemName, int itemQuantity) {
-        if(this.storage.containsKey(itemName)) {
-            Integer newQuantity = this.storage.get(itemName) - itemQuantity;
+        if(this.inventory.containsKey(itemName)) {
+            Integer newQuantity = this.inventory.get(itemName) - itemQuantity;
             if(newQuantity < 1) {
-                this.storage.remove(itemName);
+                this.inventory.remove(itemName);
             } else {
-                this.storage.put(itemName, newQuantity);
+                this.inventory.put(itemName, newQuantity);
             }
         }
 
-        this.transactionRecord.add(new ItemTransactionRecordEntry(timestamp, itemQuantity, itemName, "OUT"));
+        // If items are removed from the inventory, the transaction type "OUT" denotes it
+        this.transactionRecord.add(new ItemTransactionRecordEntry(timestamp, itemName, this.name, itemQuantity, "OUT"));
     }
 
     public String getName() {
         return this.name;
     }
 
-    public WarehouseTransactionRecord getTransactionRecord() {
-        return new WarehouseTransactionRecord(this.name, this.transactionRecord);
+
+
+    public Map<String, Integer> getInventory() {
+        return this.inventory;
+    }
+
+    public List<ItemTransactionRecordEntry> getTransactionRecord() {
+        return this.transactionRecord;
     }
 }

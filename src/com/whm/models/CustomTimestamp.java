@@ -1,6 +1,6 @@
 package com.whm.models;
 
-public class CustomTimestamp {
+public class CustomTimestamp implements Comparable<CustomTimestamp> {
     private int year;
     private int month;
     private int day;
@@ -60,5 +60,57 @@ public class CustomTimestamp {
                 + this.hour + ","
                 + this.minute + ","
                 + this.second;
+    }
+
+
+    @Override
+    public int compareTo(CustomTimestamp timestamp) {
+        if(this == timestamp) {
+            return 0;
+        }
+
+        if(this.year > timestamp.year) {
+            return 1;
+        }
+        if(this.year < timestamp.year) {
+            return -1;
+        }
+
+        if (this.month > timestamp.month) {
+            return 1;
+        }
+        if (this.month < timestamp.month) {
+            return -1;
+        }
+
+        if (this.day > timestamp.day) {
+            return 1;
+        }
+        if (this.day < timestamp.day) {
+            return -1;
+        }
+
+        if (this.hour > timestamp.hour) {
+            return 1;
+        }
+        if (this.hour < timestamp.hour) {
+            return -1;
+        }
+
+        if (this.minute > timestamp.minute) {
+            return 1;
+        }
+        if (this.minute < timestamp.minute) {
+            return -1;
+        }
+
+        if (this.second> timestamp.second) {
+            return 1;
+        }
+        if (this.second < timestamp.second) {
+            return -1;
+        }
+
+        return 0;
     }
 }
