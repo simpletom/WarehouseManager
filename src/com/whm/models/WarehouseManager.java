@@ -1,5 +1,6 @@
 package com.whm.models;
 
+import com.whm.exceptions.UnknownMovementTypeException;
 import com.whm.exceptions.WarehouseExistsException;
 import com.whm.exceptions.WarehouseNotFoundException;
 
@@ -26,31 +27,50 @@ public class WarehouseManager {
         }
     }
 
-    public void addItemToWarehouse(CustomTimestamp timeStamp, String warehouseName, Item item) throws WarehouseNotFoundException {
-        Warehouse warehouse = allWarehouses.get(warehouseName);
-
-        if(warehouse != null) {
-            warehouse.addItem(item);
-            this.recordItemMovement(timeStamp, warehouseName, "IN", item);
-
-        } else {
-            throw new WarehouseNotFoundException("Warehouse " + warehouseName + " not found");
-        }
+    public void addItemToWarehouse(CustomTimestamp timeStamp, String warehouseName, Item item) throws WarehouseNotFoundException, UnknownMovementTypeException {
+        this.moveItem(timeStamp, warehouseName, item, "IN");
     }
 
-    public void removeItemFromWarehouse(CustomTimestamp timeStamp, String warehouseName, Item item) throws WarehouseNotFoundException {
-        Warehouse warehouse = allWarehouses.get(warehouseName);
-
-        if(warehouse != null) {
-            warehouse.removeItem(item);
-            this.recordItemMovement(timeStamp, warehouseName, "OUT", item);
-        } else {
-            throw new WarehouseNotFoundException("Warehouse " + warehouseName + " not found");
-        }
+    public void removeItemFromWarehouse(CustomTimestamp timeStamp, String warehouseName, Item item) throws WarehouseNotFoundException, UnknownMovementTypeException {
+        this.moveItem(timeStamp, warehouseName, item, "OUT");
     }
 
-    private void recordItemMovement(CustomTimestamp timeStamp, String warehouseName, String movementType, Item item) {
+    private void recordItemMovement(CustomTimestamp timeStamp, String warehouseName, Item item, String movementType) {
         ItemMovementRecordEntry entry = new ItemMovementRecordEntry(timeStamp, warehouseName, movementType, item);
         this.itemMovementRecord.add(entry);
+    }
+
+    private void moveItem(CustomTimestamp timeStamp, String warehouseName, Item item, String movementType) throws WarehouseNotFoundException, UnknownMovementTypeException {
+        Warehouse warehouse = allWarehouses.get(warehouseName);
+
+        if(warehouse != null) {
+            if(movementType.equals("IN")) {
+                warehouse.addItem(item);
+                this.recordItemMovement(timeStamp, warehouseName, item, movementType);
+            } else if(movementType.equals("OUT")) {
+                warehouse.removeItem(item);
+                this.recordItemMovement(timeStamp, warehouseName, item, movementType);
+            } else {
+                throw new UnknownMovementTypeException("Unknown movement type: " + movementType);
+            }
+        } else {
+            throw new WarehouseNotFoundException("Warehouse " + warehouseName + " not found");
+        }
+    }
+
+    public ArrayList<String> getItemMovementRecordAsCSV() {
+        ArrayList<String> itemMovementEntries = new ArrayList<>();
+
+        for(ItemMovementRecordEntry recordEntry : this.itemMovementRecord) {
+            String entry = recordEntry.getTimeStamp().getTimeStampAsString() + ","
+                    + recordEntry.getMovementType() + ","
+                    + recordEntry.getWarehouseName() + ","
+                    + recordEntry.getItem().getName() + ","
+                    + recordEntry.getItem().getQuantity();
+
+            itemMovementEntries.add(entry);
+        }
+
+        return itemMovementEntries;
     }
 }
