@@ -3,4 +3,4 @@
 *.iml
 
 # Ignore Java output
-out/git
+out/
