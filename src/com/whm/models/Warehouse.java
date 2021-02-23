@@ -1,65 +1,52 @@
 package com.whm.models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Warehouse {
     private String name;
-    private ArrayList<Item> storedItems;
+    private Map<String, Integer> storage;
+    private List<ItemTransactionRecordEntry> transactionRecord;
 
     public Warehouse(String name) {
         this.name = name;
-        this.storedItems= new ArrayList<>();
+        this.storage = new HashMap<>();
+        this.transactionRecord = new ArrayList<>();
     }
 
-    public void addItem(Item newItem) {
-        Item storedItem = this.findItemByName(newItem.getName());
-        if(storedItem != null) {
+    public void addItems(CustomTimestamp timestamp, String itemName, int itemQuantity) {
+        if(this.storage.containsKey(itemName)) {
             // Item in found in storage, update quantity
-            int newQuantity = storedItem.getQuantity() + newItem.getQuantity();
-            storedItem.setQuantity(newQuantity);
+            Integer newQuantity = this.storage.get(itemName) + itemQuantity;
+            this.storage.put(itemName, newQuantity);
         } else {
             // Item is not in storage, create entry
-            this.storedItems.add(newItem);
+            this.storage.put(itemName, itemQuantity);
         }
+
+        this.transactionRecord.add(new ItemTransactionRecordEntry(timestamp, itemQuantity, itemName, "IN"));
     }
 
-    public void removeItem(Item item) {
-        Item storedItem = this.findItemByName(item.getName());
-
-        if(storedItem != null) {
-            int newQuantity = storedItem.getQuantity() - item.getQuantity();
+    public void removeItems(CustomTimestamp timestamp, String itemName, int itemQuantity) {
+        if(this.storage.containsKey(itemName)) {
+            Integer newQuantity = this.storage.get(itemName) - itemQuantity;
             if(newQuantity < 1) {
-                this.deleteItem(storedItem);
+                this.storage.remove(itemName);
             } else {
-                storedItem.setQuantity(newQuantity);
-            }
-        }
-    }
-
-    private void deleteItem(Item item) {
-        Item storedItem = this.findItemByName(item.getName());
-        if(storedItem != null) {
-            storedItems.remove(item);
-        }
-    }
-
-    private Item findItemByName(String name) {
-        Item storedItem = null;
-
-        for(Item item : storedItems) {
-            if(item.getName() == name) {
-                storedItem = item;
+                this.storage.put(itemName, newQuantity);
             }
         }
 
-        return storedItem;
+        this.transactionRecord.add(new ItemTransactionRecordEntry(timestamp, itemQuantity, itemName, "OUT"));
     }
 
     public String getName() {
         return this.name;
     }
 
-    public ArrayList<Item> getStoredItems() {
-        return this.storedItems;
+    public WarehouseTransactionRecord getTransactionRecord() {
+        return new WarehouseTransactionRecord(this.name, this.transactionRecord);
     }
 }

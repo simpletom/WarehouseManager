@@ -5,12 +5,10 @@ import com.whm.models.Item;
 import com.whm.models.Warehouse;
 import com.whm.models.WarehouseManager;
 
-import java.util.Date;
-
 public class main {
     private static WarehouseManager whManager;
-    private static Warehouse whHamburg;
-    private static Warehouse whBerlin;
+    private static Warehouse warehouseHamburg;
+    private static Warehouse warehouseBerlin;
 
     private static Item engine;
     private static Item cable;
@@ -24,12 +22,12 @@ public class main {
     }
 
     private static void setupWarehouses() {
-        whHamburg = new Warehouse("Hamburg");
-        whBerlin = new Warehouse("Berlin");
+        warehouseHamburg = new Warehouse("Hamburg");
+        warehouseBerlin = new Warehouse("Berlin");
 
         try {
-            whManager.registerWarehouse(whHamburg);
-            whManager.registerWarehouse(whBerlin);
+            whManager.registerWarehouse(warehouseHamburg);
+            whManager.registerWarehouse(warehouseBerlin);
         } catch (WarehouseExistsException e) {
             e.printStackTrace();
         }

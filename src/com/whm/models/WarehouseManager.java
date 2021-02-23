@@ -4,22 +4,18 @@ import com.whm.exceptions.UnknownMovementTypeException;
 import com.whm.exceptions.WarehouseExistsException;
 import com.whm.exceptions.WarehouseNotFoundException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class WarehouseManager {
-    private HashMap<String, Warehouse> allWarehouses;
-    private ArrayList<ItemMovementRecordEntry> itemMovementRecord;
+    private Map<String, Warehouse> allWarehouses;
 
     public WarehouseManager() {
         this.allWarehouses = new HashMap<>();
-        this.itemMovementRecord = new ArrayList<>();
     }
 
     public void registerWarehouse(Warehouse newWarehouse) throws WarehouseExistsException {
-        Warehouse wh = allWarehouses.get(newWarehouse.getName());
-
-        if(wh == null) {
+        if(allWarehouses.containsKey(newWarehouse.getName())) {
             this.allWarehouses.put(newWarehouse.getName(), newWarehouse);
             System.out.println("Warehouse " + newWarehouse.getName() + " registered");
         } else {
@@ -27,50 +23,31 @@ public class WarehouseManager {
         }
     }
 
-    public void addItemToWarehouse(CustomTimestamp timeStamp, String warehouseName, Item item) throws WarehouseNotFoundException, UnknownMovementTypeException {
-        this.moveItem(timeStamp, warehouseName, item, "IN");
+    public void addItemsToWarehouse(CustomTimestamp timeStamp, String warehouseName, String itemName, int quantity)
+            throws WarehouseNotFoundException, UnknownMovementTypeException {
+        this.moveItem(timeStamp, warehouseName, itemName, quantity, "IN");
     }
 
-    public void removeItemFromWarehouse(CustomTimestamp timeStamp, String warehouseName, Item item) throws WarehouseNotFoundException, UnknownMovementTypeException {
-        this.moveItem(timeStamp, warehouseName, item, "OUT");
+    public void removeItemsFromWarehouse(CustomTimestamp timeStamp, String warehouseName, String itemName, int quantity)
+            throws WarehouseNotFoundException, UnknownMovementTypeException {
+        this.moveItem(timeStamp, warehouseName, itemName, quantity, "OUT");
     }
 
-    private void recordItemMovement(CustomTimestamp timeStamp, String warehouseName, Item item, String movementType) {
-        ItemMovementRecordEntry entry = new ItemMovementRecordEntry(timeStamp, warehouseName, movementType, item);
-        this.itemMovementRecord.add(entry);
-    }
+    private void moveItem(CustomTimestamp timeStamp, String warehouseName, String itemName, int quantity, String movementType)
+            throws WarehouseNotFoundException, UnknownMovementTypeException {
 
-    private void moveItem(CustomTimestamp timeStamp, String warehouseName, Item item, String movementType) throws WarehouseNotFoundException, UnknownMovementTypeException {
-        Warehouse warehouse = allWarehouses.get(warehouseName);
+        Warehouse warehouse = this.allWarehouses.get(warehouseName);
 
         if(warehouse != null) {
             if(movementType.equals("IN")) {
-                warehouse.addItem(item);
-                this.recordItemMovement(timeStamp, warehouseName, item, movementType);
+                warehouse.addItems(timeStamp, itemName, quantity);
             } else if(movementType.equals("OUT")) {
-                warehouse.removeItem(item);
-                this.recordItemMovement(timeStamp, warehouseName, item, movementType);
+                warehouse.removeItems(timeStamp, itemName, quantity);
             } else {
                 throw new UnknownMovementTypeException("Unknown movement type: " + movementType);
             }
         } else {
             throw new WarehouseNotFoundException("Warehouse " + warehouseName + " not found");
         }
-    }
-
-    public ArrayList<String> getItemMovementRecordAsCSV() {
-        ArrayList<String> itemMovementEntries = new ArrayList<>();
-
-        for(ItemMovementRecordEntry recordEntry : this.itemMovementRecord) {
-            String entry = recordEntry.getTimeStamp().getTimeStampAsString() + ","
-                    + recordEntry.getMovementType() + ","
-                    + recordEntry.getWarehouseName() + ","
-                    + recordEntry.getItem().getName() + ","
-                    + recordEntry.getItem().getQuantity();
-
-            itemMovementEntries.add(entry);
-        }
-
-        return itemMovementEntries;
     }
 }

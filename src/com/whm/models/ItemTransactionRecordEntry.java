@@ -1,31 +1,22 @@
 package com.whm.models;
 
-public class ItemMovementRecordEntry {
-    private CustomTimestamp timeStamp;
-    private String warehouseName;
-    private String movementType;
-    private Item item;
+public class ItemTransactionRecordEntry {
+    private String itemName;
+    private String transactionType;
+    private CustomTimestamp timestamp;
+    private int quantity;
 
-    public ItemMovementRecordEntry(CustomTimestamp timeStamp, String warehouseName, String movementType, Item item) {
-        this.timeStamp = timeStamp;
-        this.warehouseName = warehouseName;
-        this.movementType = movementType;
-        this.item = item;
+    public ItemTransactionRecordEntry(CustomTimestamp timestamp, int quantity, String itemName, String transactionType) {
+        this.timestamp = timestamp;
+        this.itemName = itemName;
+        this.transactionType = transactionType;
+        this.quantity = quantity;
     }
 
-    public CustomTimestamp getTimeStamp() {
-        return timeStamp;
-    }
-
-    public String getWarehouseName() {
-        return this.warehouseName;
-    }
-
-    public String getMovementType() {
-        return movementType;
-    }
-
-    public Item getItem() {
-        return item;
+    public String getEntryAsCSV() {
+        return this.timestamp.getTimestampAsCSV() + ","
+                + this.itemName + ","
+                + this.quantity + ","
+                + this.transactionType;
     }
 }
