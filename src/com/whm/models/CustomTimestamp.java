@@ -1,5 +1,9 @@
 package com.whm.models;
 
+/**
+ * The CustomTimeStamp class was implemented to simulate different dates for adding or removing items from the warehouses
+ */
+
 public class CustomTimestamp implements Comparable<CustomTimestamp> {
     private int year;
     private int month;

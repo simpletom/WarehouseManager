@@ -1,5 +1,10 @@
 package com.whm.models;
 
+/**
+ *  The ItemTransActionRecordEntry holds information regarding what item in which quantity was moved in or out of a
+ *  specified warehouse.
+ */
+
 public class ItemTransactionRecordEntry implements Comparable<ItemTransactionRecordEntry> {
     private final CustomTimestamp timestamp;
     private final String itemName;
@@ -30,8 +35,5 @@ public class ItemTransactionRecordEntry implements Comparable<ItemTransactionRec
         }
 
         return this.timestamp.compareTo(itemRecordEntry.timestamp);
-
-
     }
-
 }

@@ -5,6 +5,10 @@ import com.whm.exceptions.WarehouseNotFoundException;
 
 import java.util.*;
 
+/**
+ * The WarehouseManager is responsible for registering and managing warehouses
+ */
+
 public class WarehouseManager {
     private Map<String, Warehouse> allWarehouses;
 
@@ -20,17 +24,28 @@ public class WarehouseManager {
         }
     }
 
-    public List<ItemTransactionRecordEntry> getTransactionRecord(String warehouseName) throws WarehouseNotFoundException {
-        if(this.allWarehouses.containsKey(warehouseName)) {
-            return this.allWarehouses.get(warehouseName).getTransactionRecord();
-        } else {
+    public Warehouse getWarehouse(String warehouseName) throws WarehouseNotFoundException {
+        Warehouse warehouse = this.allWarehouses.get(warehouseName);
+        if(warehouse == null) {
             throw new WarehouseNotFoundException(warehouseName + " not found");
         }
+
+        return warehouse;
+    }
+
+    public List<String> getAllWarehouseNames() {
+        List<String> allNames = new ArrayList<>();
+        for(String name : this.allWarehouses.keySet()) {
+            allNames.add(name);
+        }
+
+        return allNames;
     }
 
     public List<ItemTransactionRecordEntry> getChronologicalTransactions(List<String> warehouseNames) {
         List<Warehouse> warehouses = new ArrayList<>();
 
+        // The warehouses are retrieved by their name
         for(String warehouseName : warehouseNames) {
             if(this.allWarehouses.containsKey(warehouseName)) {
                 warehouses.add(this.allWarehouses.get(warehouseName));
@@ -39,22 +54,14 @@ public class WarehouseManager {
 
         List<ItemTransactionRecordEntry> allTransactionRecordsSorted = new ArrayList<>();
 
+        // All transaction records are added to a singe list
         for(Warehouse warehouse : warehouses) {
             allTransactionRecordsSorted.addAll(warehouse.getTransactionRecord());
         }
 
+        // The list gets sorted according to the timestamp
         Collections.sort(allTransactionRecordsSorted);
 
         return allTransactionRecordsSorted;
-    }
-
-    public Map<String, Integer> getInventory(String warehouseName) throws WarehouseNotFoundException {
-        Warehouse warehouse = this.allWarehouses.get(warehouseName);
-
-        if(warehouse == null) {
-            throw new WarehouseNotFoundException(warehouseName + " not found");
-        } else {
-            return warehouse.getInventory();
-        }
     }
 }

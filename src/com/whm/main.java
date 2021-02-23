@@ -5,8 +5,6 @@ import com.whm.exceptions.WarehouseExistsException;
 import com.whm.exceptions.WarehouseNotFoundException;
 import com.whm.models.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class main {
@@ -33,41 +31,39 @@ public class main {
         executeTransactions();
 
         // Print transaction for a specific warehouse
-        showTransactions("Hamburg");
+        printTransactions("Hamburg");
 
         // Print inventory for a specific warehouse
-        showInventory("Hamburg");
+        printInventory("Hamburg");
 
         // Print transactions for all specified warehouses in chronological order
-        List<String> warehouses = new ArrayList<>(Arrays.asList("Hamburg", "Berlin"));
-        showChronologicalTransactions(warehouses);
+        List<String> warehouses = warehouseManager.getAllWarehouseNames();
+        printChronologicalTransactions(warehouses);
     }
 
-    private static void showChronologicalTransactions(List<String> warehouses) {
+    private static void printChronologicalTransactions(List<String> warehouses) {
         List<ItemTransactionRecordEntry> sortedTransactionEntries = warehouseManager.getChronologicalTransactions(warehouses);
         for(ItemTransactionRecordEntry entry : sortedTransactionEntries) {
             System.out.println(entry.getEntryAsCSV());
         }
     }
 
-    private static void showInventory(String warehouseName) {
+    private static void printInventory(String warehouseName) {
         try {
-            System.out.println(warehouseManager.getInventory(warehouseName));
+            System.out.println(warehouseManager.getWarehouse(warehouseName).getInventory());
         } catch (WarehouseNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    private static void showTransactions(String warehouseName) {
+    private static void printTransactions(String warehouseName) {
         try {
-            List<ItemTransactionRecordEntry> allTransactions = warehouseManager.getTransactionRecord(warehouseName);
-            List<String> transactionsAsString = new ArrayList<>();
+            List<ItemTransactionRecordEntry> allTransactions = warehouseManager.getWarehouse(warehouseName).getTransactionRecord();
 
             for(ItemTransactionRecordEntry entry : allTransactions) {
-                transactionsAsString.add(entry.getEntryAsCSV());
+                System.out.println(entry.getEntryAsCSV());
             }
 
-            System.out.println(transactionsAsString);
         } catch (WarehouseNotFoundException e) {
             e.printStackTrace();
         }

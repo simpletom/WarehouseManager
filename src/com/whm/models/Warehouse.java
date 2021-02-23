@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The Warehouse stores the name of the stored items and the stored quantity in name->quantity pairs. It also tracks the
+ * history of received or issued items
+ */
 public class Warehouse {
     private String name;
     private Map<String, Integer> inventory;
@@ -47,8 +51,6 @@ public class Warehouse {
     public String getName() {
         return this.name;
     }
-
-
 
     public Map<String, Integer> getInventory() {
         return this.inventory;

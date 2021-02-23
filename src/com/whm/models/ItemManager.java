@@ -6,6 +6,11 @@ import com.whm.exceptions.ItemNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The ItemManager adds items to the set of managed items based on the item name. The item name is the primary key for
+ * items
+ */
+
 public class ItemManager {
     private Map<String, Item> allItems;
 

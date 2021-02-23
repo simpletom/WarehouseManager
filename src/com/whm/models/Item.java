@@ -1,5 +1,9 @@
 package com.whm.models;
 
+/**
+ * The Item class holds information regarding the managed items.
+ */
+
 public class Item {
     private String name;
     private int basePrice;
