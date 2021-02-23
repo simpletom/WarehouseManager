@@ -1,3 +1,6 @@
 # Ignore IDEA files
 .idea/
 *.iml
+
+# Ignore Java output
+out/git
